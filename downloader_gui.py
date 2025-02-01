@@ -28,7 +28,7 @@ class DownloaderGUI(BoxLayout):
         self.spacing = 10
         
         # Add spotify client initialization
-        from downloader_proto import init_spotify_client
+        from downloader import init_spotify_client
         self.spotify_client = init_spotify_client()
         
         # Set default output directory
@@ -229,7 +229,7 @@ class DownloaderGUI(BoxLayout):
             self.log(f"Processing URL: {url}")
             if "open.spotify.com" in url:
                 self.log("Detected Spotify URL, fetching song details...")
-                from downloader_proto import get_song_from_client, get_song_url
+                from downloader import get_song_from_client, get_song_url
                 self.spotify_song = get_song_from_client(url, self.spotify_client)
                 self.log(f"Found Spotify song: {self.spotify_song.display_name}")
                 self.log("Converting to YouTube URL...")
@@ -241,7 +241,7 @@ class DownloaderGUI(BoxLayout):
                 self.log("Detected YouTube URL")
                 self.yt_url = url
                 Clock.schedule_once(lambda dt: self.update_url_label(f"YouTube URL: {self.yt_url}"))
-                from downloader_proto import get_yt_title
+                from downloader import get_yt_title
                 self.log("Fetching YouTube video title...")
                 title = get_yt_title(url)
                 self.log(f"Found video title: {title}")
@@ -306,7 +306,7 @@ class DownloaderGUI(BoxLayout):
         
     def download_task(self):
         try:
-            from downloader_proto import download_yt_song, separate_audio, remix_audio
+            from downloader import download_yt_song, separate_audio, remix_audio
             
             self.log(f"Starting download task: {self.current_task}")
             output_path = Path(self.output_dir.text.strip('"\''))
