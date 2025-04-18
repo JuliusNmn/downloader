@@ -20,6 +20,26 @@ import subprocess
 import platform
 import os
 
+class MyLogger:
+    def __init__(self, gui_instance):
+        self.gui_instance = gui_instance
+
+    def debug(self, msg):
+        if msg.startswith('[debug] '):
+            pass
+        else:
+            self.info(msg)
+
+    def info(self, msg):
+        self.gui_instance.log(msg)
+
+    def warning(self, msg):
+        self.gui_instance.log(f"Warning: {msg}")
+
+    def error(self, msg):
+        self.gui_instance.log(f"Error: {msg}")
+
+
 class DownloaderGUI(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -147,6 +167,9 @@ class DownloaderGUI(BoxLayout):
         
         # Bind input field to URL checker
         self.input_field.bind(text=self.on_input_change)
+        
+        # Initialize MyLogger with self
+        self.logger = MyLogger(self)
         
     def log(self, message):
         Clock.schedule_once(lambda dt: self.update_log(message))
@@ -348,10 +371,27 @@ class DownloaderGUI(BoxLayout):
                     'progress_hooks': [download_progress],
                     'cookiesfrombrowser': ('safari',),
                     'outtmpl': {"default": str(temp_path)},
+                    'logger': self.logger
                 }
-                self.log("Starting YouTube download...")
-                temp_file = download_yt_song(self.yt_url, ytdl_opts, output_path, temp_path, "m4a", self.spotify_song)
-                self.log(f"Download completed. File saved to: {temp_file.absolute()}")
+                try:
+                    self.log("Starting YouTube download...")
+                    temp_file = download_yt_song(self.yt_url, ytdl_opts, output_path, temp_path, "m4a", self.spotify_song)
+                    self.log(f"Download completed. File saved to: {temp_file.absolute()}")
+                except Exception as e:
+                    if "failed to load cookies" in str(e):
+                        error_msg = (
+                            "Unable to access Safari cookies. To fix this:\n"
+                            "1. Open System Settings\n"
+                            "2. Go to Privacy & Security > Full Disk Access\n"
+                            "3. Click the '+' button\n"
+                            "4. Navigate to and select Python or your application\n"
+                            "5. Restart the application\n"
+                            "\nThis is required to access Safari cookies for YouTube downloads."
+                        )
+                        self.log(error_msg)
+                        self.show_notification("Permission Required", "Full Disk Access required for Safari cookies")
+                        return
+                    raise  # Re-raise other exceptions
 
             # Check if we have a valid temp_file before proceeding
             if temp_file is None:

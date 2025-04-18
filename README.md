@@ -4,15 +4,10 @@ Screenshot:
 
 ![Screenshot](screenshot.png)
 
-## Setup
-
-```bash
-./setup.sh
-```
-
 ## Run
+Requires conda to be installed
 
 ```bash
-./run.sh
+./run_gui.sh
 ```
 

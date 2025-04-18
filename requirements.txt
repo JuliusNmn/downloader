@@ -1,6 +1,7 @@
+setuptools==78.1.0
 git+https://github.com/adefossez/demucs
 numpy==1.24.1
-git+https://github.com/spotDL/spotify-downloader@d81c60102dfeab84669fe2acd2eed8deca03e50c
+spotdl==4.2.11
 pyperclip
 plyer
 kivy
